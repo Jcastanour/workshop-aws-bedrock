@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIMBUS / AWS Cloud Practitioner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="grain"></div>
+
+    <div class="frame">
+        <span class="bracket bracket-tl"></span>
+        <span class="bracket bracket-tr"></span>
+        <span class="bracket bracket-bl"></span>
+        <span class="bracket bracket-br"></span>
+    </div>
+
+    <header class="topbar">
+        <div class="topbar-left">
+            <span class="dot"></span>
+            <span class="mono">NIMBUS · v0.1.0</span>
+        </div>
+        <div class="topbar-center mono">
+            <span class="muted">SESSION_ID</span> 00<span id="session-id">42</span> / <span class="muted">REGION</span> us-east-1
+        </div>
+        <div class="topbar-right mono">
+            <span id="clock">--:--:--</span>
+        </div>
+    </header>
+
+    <main class="stage">
+        <aside class="rail rail-left">
+            <div class="rail-title mono">PROTOCOL</div>
+            <ol class="rail-list mono">
+                <li><span>01</span> Bedrock</li>
+                <li><span>02</span> Nova Lite</li>
+                <li><span>03</span> Lambda</li>
+                <li><span>04</span> API Gateway</li>
+                <li><span>05</span> S3 Static</li>
+            </ol>
+            <div class="rail-foot mono">
+                <div class="muted">STATUS</div>
+                <div class="status-row"><span class="pulse"></span> ONLINE</div>
+            </div>
+        </aside>
+
+        <section class="chat">
+            <div class="chat-head">
+                <div class="eyebrow mono">— Asistente experimental N°01</div>
+                <h1 class="display">
+                    Pregúntale lo que <em>quieras</em><br>
+                    sobre <span class="accent">AWS Cloud Practitioner</span>.
+                </h1>
+                <p class="lede">
+                    Una conversación con un agente potenciado por <span class="mono">amazon.nova-lite-v1</span>,
+                    desplegado sobre Lambda + API Gateway. Respuestas claras, breves, sin adornos.
+                </p>
+            </div>
+
+            <div class="thread" id="chat-box">
+                <article class="msg msg-ai">
+                    <header class="msg-meta mono">
+                        <span class="msg-tag">AGENTE</span>
+                        <span class="muted">·</span>
+                        <span class="muted">handshake</span>
+                    </header>
+                    <div class="msg-body">
+                        Hola. Estoy listo. Hazme una pregunta sobre servicios, modelos de responsabilidad, pricing o cualquier dominio del examen <span class="mono">CLF-C02</span>.
+                    </div>
+                </article>
+            </div>
+
+            <form class="composer" onsubmit="event.preventDefault(); askQuestion();">
+                <div class="composer-meta mono">
+                    <span class="muted">PROMPT</span>
+                    <span class="muted">↵ enviar · ⇧↵ nueva línea</span>
+                </div>
+                <div class="composer-body">
+                    <textarea
+                        id="question"
+                        placeholder="¿Qué es el modelo de responsabilidad compartida?"
+                        rows="2"
+                        autofocus
+                    ></textarea>
+                    <button type="submit" class="send" aria-label="Enviar">
+                        <span class="send-label">ENVIAR</span>
+                        <span class="send-arrow">→</span>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <aside class="rail rail-right">
+            <div class="rail-title mono">SUGERENCIAS</div>
+            <ul class="suggest mono">
+                <li data-q="Explica el modelo de responsabilidad compartida de AWS.">→ Modelo de responsabilidad compartida</li>
+                <li data-q="¿Cuál es la diferencia entre EC2, Lambda y Fargate?">→ EC2 vs Lambda vs Fargate</li>
+                <li data-q="¿Qué pilares tiene el AWS Well-Architected Framework?">→ Well-Architected Framework</li>
+                <li data-q="Dame una visión general de los servicios de almacenamiento (S3, EBS, EFS).">→ Storage: S3, EBS, EFS</li>
+                <li data-q="¿Qué es IAM y cuáles son sus componentes?">→ IAM en 60 segundos</li>
+            </ul>
+            <div class="rail-foot mono">
+                <div class="muted">MODEL</div>
+                <div>amazon.nova-lite-v1</div>
+                <div class="muted" style="margin-top:10px">TEMP</div>
+                <div>0.3</div>
+            </div>
+        </aside>
+    </main>
+
+    <footer class="bottombar mono">
+        <span>© Juan Pablo Castaño · 2026</span>
+        <span class="muted">Built with Bedrock · Lambda · Terraform</span>
+        <span>NIMBUS//<span id="latency">—</span> ms</span>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

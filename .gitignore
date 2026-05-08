@@ -1,0 +1,67 @@
+# ===== Sistema operativo =====
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# ===== Editores / IDEs =====
+.vscode/
+.idea/
+*.sublime-*
+
+# ===== Terraform =====
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.terraform.tfstate.lock.info
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+.env
+.env.*
+!.env.example
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===== Lambda build artifacts =====
+# (mantenemos lambda.zip versionado para que Terraform pueda desplegarlo)
+app/lambda/package/
+app/lambda/build/
+app/lambda/*.egg-info/
+
+# ===== Node (por si se agrega luego) =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== AWS / secretos =====
+*.pem
+*.key
+.aws/
+credentials
+*.secret
+secrets.json
+
+# ===== Logs =====
+*.log
+logs/
