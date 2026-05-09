@@ -48,14 +48,22 @@ jobs:
         id: tf
         working-directory: infra
         run: |
-          echo "api_url=$(terraform output -raw api_url)"       >> $GITHUB_OUTPUT
-          echo "bucket=$(terraform output -raw frontend_bucket)" >> $GITHUB_OUTPUT
-          echo "web_url=$(terraform output -raw frontend_url)"   >> $GITHUB_OUTPUT
+          API_URL=$(terraform output -raw api_url)
+          BUCKET=$(terraform output -raw frontend_bucket)
+          WEB_URL=$(terraform output -raw frontend_url)
+
+          # Enmascarar en los logs (valores públicos pero higiene visual)
+          echo "::add-mask::$API_URL"
+
+          echo "api_url=$API_URL" >> $GITHUB_OUTPUT
+          echo "bucket=$BUCKET"   >> $GITHUB_OUTPUT
+          echo "web_url=$WEB_URL" >> $GITHUB_OUTPUT
 
       - name: Inject API_URL into app.js
         run: |
           sed -i "s|const API_URL = .*|const API_URL = \"${{ steps.tf.outputs.api_url }}\";|" \
             app/frontend/app.js
+          echo "API_URL inyectado correctamente"
 
       - name: Sync frontend to S3
         run: |
@@ -63,8 +71,30 @@ jobs:
             --delete \
             --cache-control "no-cache, no-store, must-revalidate"
 
-      - name: Summary
+      - name: Summary bonito
         run: |
-          echo "### ✓ Deploy completo"  >> $GITHUB_STEP_SUMMARY
-          echo "- API: ${{ steps.tf.outputs.api_url }}"          >> $GITHUB_STEP_SUMMARY
-          echo "- Web: http://${{ steps.tf.outputs.web_url }}"   >> $GITHUB_STEP_SUMMARY
+          WEB="http://${{ steps.tf.outputs.web_url }}"
+          cat <<EOF >> $GITHUB_STEP_SUMMARY
+          # 🚀 Deploy completo
+
+          ## 🌐 Frontend desplegado
+
+          ### 👉 [Abrir AWSensei]($WEB)
+
+          \`\`\`
+          $WEB
+          \`\`\`
+
+          ## 📦 Recursos
+
+          | Recurso | Valor |
+          |---|---|
+          | **Bucket S3** | \`${{ steps.tf.outputs.bucket }}\` |
+          | **Lambda** | \`pablocastano6-ai-cloud-practitioner-agente\` |
+          | **Modelo** | \`amazon.nova-lite-v1:0\` |
+          | **Region** | \`us-east-1\` |
+
+          ## 💡 Tip
+
+          Si la web no carga el último cambio, abre con **Ctrl + Shift + R** (hard refresh).
+          EOF
