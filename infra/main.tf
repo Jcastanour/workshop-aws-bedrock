@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "frontend" {
-  bucket = "aws-bucket-ai-agent-pablocastano6"
+  bucket = "aws-agent-ai-pablocastano6-2026"
 }
 
 resource "aws_s3_bucket_website_configuration" "frontend" {

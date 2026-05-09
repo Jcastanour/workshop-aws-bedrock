@@ -65,3 +65,7 @@ secrets.json
 # ===== Logs =====
 *.log
 logs/
+
+# ===== Agent skills locales (no son del proyecto) =====
+**/.agents/
+**/skills-lock.json

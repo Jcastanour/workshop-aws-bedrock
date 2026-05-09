@@ -1,0 +1,70 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Build Lambda zip
+        working-directory: app/lambda
+        run: |
+          rm -f lambda.zip
+          zip -r lambda.zip app.py
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init -input=false
+
+      - name: Terraform Apply
+        working-directory: infra
+        run: terraform apply -auto-approve -input=false
+
+      - name: Read outputs
+        id: tf
+        working-directory: infra
+        run: |
+          echo "api_url=$(terraform output -raw api_url)"       >> $GITHUB_OUTPUT
+          echo "bucket=$(terraform output -raw frontend_bucket)" >> $GITHUB_OUTPUT
+          echo "web_url=$(terraform output -raw frontend_url)"   >> $GITHUB_OUTPUT
+
+      - name: Inject API_URL into app.js
+        run: |
+          sed -i "s|const API_URL = .*|const API_URL = \"${{ steps.tf.outputs.api_url }}\";|" \
+            app/frontend/app.js
+
+      - name: Sync frontend to S3
+        run: |
+          aws s3 sync app/frontend/ s3://${{ steps.tf.outputs.bucket }}/ \
+            --delete \
+            --cache-control "no-cache, no-store, must-revalidate"
+
+      - name: Summary
+        run: |
+          echo "### ✓ Deploy completo"  >> $GITHUB_STEP_SUMMARY
+          echo "- API: ${{ steps.tf.outputs.api_url }}"          >> $GITHUB_STEP_SUMMARY
+          echo "- Web: http://${{ steps.tf.outputs.web_url }}"   >> $GITHUB_STEP_SUMMARY

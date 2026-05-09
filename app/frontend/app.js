@@ -1,10 +1,9 @@
 /* =========================================================
-   NIMBUS — frontend logic
+   AWSensei — frontend logic
    Reemplazar API_URL con el endpoint real de API Gateway
    ========================================================= */
 
-const API_URL = "REPLACE_WITH_API_GATEWAY_URL";
-
+const API_URL = "https://oa1ps2f9g4.execute-api.us-east-1.amazonaws.com";
 const chatBox      = document.getElementById("chat-box");
 const questionInput = document.getElementById("question");
 const clockEl      = document.getElementById("clock");

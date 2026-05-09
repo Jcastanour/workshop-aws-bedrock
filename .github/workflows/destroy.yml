@@ -1,0 +1,68 @@
+name: Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Escribe "destroy" para confirmar la eliminación de toda la infra'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validar confirmación
+        if: ${{ inputs.confirm != 'destroy' }}
+        run: |
+          echo "❌ Confirmación inválida. Escribe exactamente 'destroy' para continuar."
+          exit 1
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region:            ${{ env.AWS_REGION }}
+
+      - name: Build Lambda zip (necesario para terraform plan)
+        working-directory: app/lambda
+        run: |
+          rm -f lambda.zip
+          zip -r lambda.zip app.py
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.9.0
+
+      - name: Terraform Init
+        working-directory: infra
+        run: terraform init -input=false
+
+      - name: Vaciar bucket frontend (S3 no permite borrar buckets con objetos)
+        run: |
+          BUCKET=$(cd infra && terraform output -raw frontend_bucket 2>/dev/null || echo "")
+          if [ -n "$BUCKET" ]; then
+            echo "Vaciando s3://$BUCKET ..."
+            aws s3 rm "s3://$BUCKET" --recursive || true
+          fi
+
+      - name: Terraform Destroy
+        working-directory: infra
+        run: terraform destroy -auto-approve -input=false
+
+      - name: Summary
+        run: |
+          echo "### 💥 Infraestructura destruida" >> $GITHUB_STEP_SUMMARY
+          echo "Todos los recursos del lab fueron eliminados." >> $GITHUB_STEP_SUMMARY
+          echo "El bucket de tfstate (\`aws-tfstate-pablocastano6-2026\`) NO se borra automáticamente." >> $GITHUB_STEP_SUMMARY
